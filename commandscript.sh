@@ -46,6 +46,10 @@ do
         coreapp-reload)
             docker-compose up coreapp --build -d
             ;;
+
+        coreapp-test)
+            docker run  -v $(pwd)/test-reports:/var/www/html/ci4app/test-reports cynic_coreapp ./vendor/bin/phpunit
+            ;;
         
                     
     esac

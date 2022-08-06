@@ -2,13 +2,15 @@
 
 Does not do:
 - ssl
+- container versioning, api versioning
 
 TODO:
-- git repo
 - testing
 - dbapi
 - tests
+- application
 - docs
+  - overview of project
   - API docs
   - architecture overview
   - command overview
@@ -26,6 +28,10 @@ TODO:
     - editor
     - API interactor (insomnia)
     - bash
-    
-
-
+- cookies secure, same-site, httponly https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
+- requirements
+  - security (xss, user auth)
+  - perf: loads in less than x ms, page size less than x kb
+  - compliance: validates to css 2.1 and xhtml transitional 1.0
+  - code quality: style, strict types
+- admin dashboard

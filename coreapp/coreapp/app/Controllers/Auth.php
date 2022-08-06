@@ -9,7 +9,7 @@ use Firebase\JWT\Key;
 class Auth extends BaseController
 {
     
-    private function generate_jwt($username){
+    private function generate_jwt($username, $role){
         $secretKey = getenv('SECRET_KEY');
         $issuedAt = new \DateTimeImmutable();
         $expire = $issuedAt->modify('+1 hour')->getTimestamp();
@@ -20,7 +20,8 @@ class Auth extends BaseController
             'iss'  => $serverName,                       // Issuer
             'nbf'  => $issuedAt->getTimestamp(),         // Not before
             'exp'  => $expire,                           // Expires in 1 hour
-            'userName' => $username,                     // User name
+            'username' => $username,                     // User name
+            'role' => $role,
         ];
         return JWT::encode($data, $secretKey, 'HS512');
 
@@ -28,6 +29,7 @@ class Auth extends BaseController
     
     public function index()
     {
+        /*
         $model = model(App\Models\Auth::class);
         $allUsers = $model->getAllUsers();
         foreach($allUsers as $user){
@@ -37,7 +39,25 @@ class Auth extends BaseController
             echo "----<br/>";
         }
         echo "done";
-        return view("home");
+        */
+        return view("header") . view("authHome") . view("footer");
+    }
+
+    public function signup_page()
+    {
+        return view("header") . view("authSignUp") . view("footer");
+    }
+
+    public function signup()
+    {
+        if($this->validate([
+            'username' => 'required|alpha_numeric|min_length[3]|max_length[128]|is_unique[auth.username]',
+            'password' => 'required|min_length[3]|max_length[128]|matches[confirm_password]',
+        ])){
+            return view("header") . view("authSignUpSuccess") . view("footer");
+        } else {
+            return view("header") . view("authSignUp") . view("footer");
+        }
     }
 
     public function login()
@@ -64,7 +84,7 @@ class Auth extends BaseController
             if(password_verify($submitted_password, $user['password'])){
                 $data = [
                     'success' => true,
-                    'jwt'=> $this->generate_jwt($user['username'])
+                    'jwt'=> $this->generate_jwt($user['username'], $user['role'])
                 ];
                 $status_code = 200;
             } else {
@@ -86,7 +106,18 @@ class Auth extends BaseController
         #TODO: validate input here
 
         $secretKey = getenv('SECRET_KEY');
-        $token = JWT::decode($jwt, new Key($secretKey, 'HS512'));
+        try {
+            $token = JWT::decode($jwt, new Key($secretKey, 'HS512'));
+        } catch (\Exception $e){
+            $data = [
+                 'success' => false,
+                 'jwt' => ''
+             ];
+             $status_code = 401;
+             return $this->response->setStatusCode($status_code)->setJSON($data);
+        }
+
+        
         $now = new \DateTimeImmutable();
         $serverName = "cynic";
 
@@ -105,7 +136,7 @@ class Auth extends BaseController
         } else {
             $data = [
                 'success' => true,
-                'jwt'=> $this->generate_jwt($token->userName)
+                'jwt'=> $this->generate_jwt($token->username, $token->role)
              ];
             $status_code = 200;
         }

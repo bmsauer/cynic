@@ -38,8 +38,10 @@ $routes->set404Override();
 $routes->get('/', 'Home::index');
 
 $routes->get('/auth', 'Auth::index');
-$routes->post('/auth/login', 'Auth::login');
-$routes->post('/auth/authenticate', 'Auth::authenticate');
+$routes->get('/auth/signup', 'Auth::signup_page');
+$routes->post('/auth/signup', 'Auth::signup');
+$routes->post('/api/auth/login', 'Auth::login');
+$routes->post('/api/auth/authenticate', 'Auth::authenticate');
 /*
  * --------------------------------------------------------------------
  * Additional Routing

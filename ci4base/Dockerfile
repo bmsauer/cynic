@@ -11,6 +11,7 @@ RUN mv composer.phar /usr/local/bin/composer && chmod +x /usr/local/bin/composer
 
 #install php extensions
 RUN docker-php-ext-install intl mysqli
+RUN pecl install xdebug && docker-php-ext-enable xdebug && echo "xdebug.mode=coverage" >> $PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini
 
 #enable apache mods
 RUN a2enmod rewrite

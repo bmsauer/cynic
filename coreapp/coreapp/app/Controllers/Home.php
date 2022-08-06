@@ -6,7 +6,7 @@ class Home extends BaseController
 {
     public function index()
     {
-
+        /*
         $db = \Config\Database::connect();
         $query   = $db->query('SELECT k,v from kv;');
         $results = $query->getResult();
@@ -21,7 +21,9 @@ class Home extends BaseController
         
         $config = new \Config\App();
         $data["bu"] = $config->baseURL;
-            
+       
         return view('home', $data);
+        */
+        return view('header') . view('home') . view('footer');
     }
 }
