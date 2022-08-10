@@ -15,7 +15,7 @@ class AuthTest extends CIUnitTestCase
     protected $migrate     = true;
     protected $migrateOnce = false;
     protected $refresh     = true;
-    //protected $namespace   = 'Tests\Support';
+    //protected $namespace   = ''; //use real migrations on test database
     
     // For Seeds
     protected $seedOnce = false;
@@ -35,13 +35,19 @@ class AuthTest extends CIUnitTestCase
         // Do something here....
     }
 
-    public function testGenerate_jwt() {
-        $controller = new \App\Controllers\Auth();
-        // Get the invoker for the 'privateMethod' method.
-        $method = $this->getPrivateMethodInvoker($controller, 'generate_jwt');
-        
-        //$jwt = $this->controller(\App\Controllers\Auth::class)->execute("generate_jwt", "testuser", "user");
-        $jwt = $method("testuser", "user");
-        $this->assertIsString($jwt);
+    public function test_authenticate(){
+        $body = json_encode(['jwt' => 'bad_jwt']);
+        $request = new \CodeIgniter\HTTP\IncomingRequest(
+            new \Config\App(),
+            new \CodeIgniter\HTTP\URI('http://example.com'),
+            null,
+            new \CodeIgniter\HTTP\UserAgent()
+        );
+        $request->setHeader("Content-Type", "application/json");
+        $request->setBody($body);
+        $result = $this->withRequest($request)->controller(\App\Controllers\Auth::class)->execute('authenticate');
+        $result->assertStatus(401);
     }
+
+   
 }

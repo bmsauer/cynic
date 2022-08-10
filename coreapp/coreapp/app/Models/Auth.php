@@ -18,4 +18,12 @@ class Auth extends Model
         return $this->where(['username' => $username])->first();
     }
 
+    public function createUser($username, $password){
+        $data = [
+            'username' => $username,
+            'password'    => password_hash($password, PASSWORD_DEFAULT),
+        ];
+        $this->save($data);
+    }
+
 }

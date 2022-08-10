@@ -1,6 +1,7 @@
 <h1>Cynic Core Application - Auth Module</h1>
 
 <?= session()->getFlashdata('error') ?>
+<?= session()->getFlashdata('message') ?>
 <?= service('validation')->listErrors() ?>
 
 <form action="/auth/signup" method="post">

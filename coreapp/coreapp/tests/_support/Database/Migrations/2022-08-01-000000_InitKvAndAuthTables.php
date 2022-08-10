@@ -6,9 +6,6 @@ use CodeIgniter\Database\Migration;
 
 class InitKvAndAuthTables extends Migration
 {
-
-    protected $DBGroup = 'tests';
-    
     public function up()
     {
         //kv
@@ -30,6 +27,8 @@ class InitKvAndAuthTables extends Migration
                 'constraint'     => '128',
             ],
         ]);
+        $this->forge->addField("updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP");
+        $this->forge->addKey(['k', 'app'], true, true); #k and app are primary keys, unique
         $this->forge->createTable('kv');
 
         //auth
@@ -49,6 +48,7 @@ class InitKvAndAuthTables extends Migration
             ],
         ]);
         $this->forge->addField("created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP");
+        $this->forge->addKey('username', true, true); #username is primary key, unique
         $this->forge->createTable('auth');
         
     }

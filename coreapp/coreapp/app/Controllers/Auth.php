@@ -3,43 +3,13 @@
 namespace App\Controllers;
 
 use CodeIgniter\HTTP\IncomingRequest;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
+use App\Libraries\CynicJWT;
 
 class Auth extends BaseController
 {
     
-    private function generate_jwt($username, $role){
-        $secretKey = getenv('SECRET_KEY');
-        $issuedAt = new \DateTimeImmutable();
-        $expire = $issuedAt->modify('+1 hour')->getTimestamp();
-        $serverName = "cynic";
-
-        $data = [
-            'iat'  => $issuedAt->getTimestamp(),         // Issued at: time when the token was generated
-            'iss'  => $serverName,                       // Issuer
-            'nbf'  => $issuedAt->getTimestamp(),         // Not before
-            'exp'  => $expire,                           // Expires in 1 hour
-            'username' => $username,                     // User name
-            'role' => $role,
-        ];
-        return JWT::encode($data, $secretKey, 'HS512');
-
-    }
-    
     public function index()
     {
-        /*
-        $model = model(App\Models\Auth::class);
-        $allUsers = $model->getAllUsers();
-        foreach($allUsers as $user){
-            echo $user["username"] . "<br/>";
-            echo $user["password"] . "<br/>";
-            echo $user["created_at"] . "<br/>";
-            echo "----<br/>";
-        }
-        echo "done";
-        */
         return view("header") . view("authHome") . view("footer");
     }
 
@@ -54,7 +24,9 @@ class Auth extends BaseController
             'username' => 'required|alpha_numeric|min_length[3]|max_length[128]|is_unique[auth.username]',
             'password' => 'required|min_length[3]|max_length[128]|matches[confirm_password]',
         ])){
-            return view("header") . view("authSignUpSuccess") . view("footer");
+            $model = model(App\Models\Auth::class);
+            $model->createUser($this->request->getPost('username'), $this->request->getPost('password'));
+            return redirect()->to('/auth/signup')->with('message', 'Successful Signup.');
         } else {
             return view("header") . view("authSignUp") . view("footer");
         }
@@ -84,7 +56,7 @@ class Auth extends BaseController
             if(password_verify($submitted_password, $user['password'])){
                 $data = [
                     'success' => true,
-                    'jwt'=> $this->generate_jwt($user['username'], $user['role'])
+                    'jwt'=> CynicJWT::generate_jwt($user['username'], $user['role'])
                 ];
                 $status_code = 200;
             } else {
@@ -105,9 +77,8 @@ class Auth extends BaseController
         $jwt = $request_data["jwt"];
         #TODO: validate input here
 
-        $secretKey = getenv('SECRET_KEY');
         try {
-            $token = JWT::decode($jwt, new Key($secretKey, 'HS512'));
+            $token = CynicJWT::decode_jwt($jwt);
         } catch (\Exception $e){
             $data = [
                  'success' => false,
@@ -136,7 +107,7 @@ class Auth extends BaseController
         } else {
             $data = [
                 'success' => true,
-                'jwt'=> $this->generate_jwt($token->username, $token->role)
+                'jwt'=> CynicJWT::generate_jwt($token->username, $token->role)
              ];
             $status_code = 200;
         }

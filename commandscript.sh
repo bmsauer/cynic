@@ -50,6 +50,9 @@ do
         coreapp-test)
             docker run  -v $(pwd)/test-reports:/var/www/html/ci4app/test-reports cynic_coreapp ./vendor/bin/phpunit
             ;;
+        *)
+            echo "Invalid command: $COMMAND"
+            exit 1
         
                     
     esac

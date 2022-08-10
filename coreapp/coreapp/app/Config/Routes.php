@@ -42,6 +42,11 @@ $routes->get('/auth/signup', 'Auth::signup_page');
 $routes->post('/auth/signup', 'Auth::signup');
 $routes->post('/api/auth/login', 'Auth::login');
 $routes->post('/api/auth/authenticate', 'Auth::authenticate');
+
+$routes->post('/api/db', 'KeyValueDatabase::put');
+$routes->get('/api/db', 'KeyValueDatabase::get');
+$routes->put('/api/db', 'KeyValueDatabase::update');
+$routes->delete('/api/db', 'KeyValueDatabase::delete');
 /*
  * --------------------------------------------------------------------
  * Additional Routing
