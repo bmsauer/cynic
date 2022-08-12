@@ -43,10 +43,10 @@ $routes->post('/auth/signup', 'Auth::signup');
 $routes->post('/api/auth/login', 'Auth::login');
 $routes->post('/api/auth/authenticate', 'Auth::authenticate');
 
-$routes->post('/api/db', 'KeyValueDatabase::put');
-$routes->get('/api/db', 'KeyValueDatabase::get');
-$routes->put('/api/db', 'KeyValueDatabase::update');
-$routes->delete('/api/db', 'KeyValueDatabase::delete');
+$routes->post('/api/db/(:segment)/(:segment)', 'KeyValueDatabase::create');
+$routes->get('/api/db/(:segment)/(:segment)', 'KeyValueDatabase::read');
+$routes->put('/api/db/(:segment)/(:segment)', 'KeyValueDatabase::upsert');
+$routes->delete('/api/db/(:segment)/(:segment)', 'KeyValueDatabase::delete');
 /*
  * --------------------------------------------------------------------
  * Additional Routing
