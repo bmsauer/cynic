@@ -44,7 +44,7 @@ do
             docker-compose cp coreapp:/var/www/html/ci4app/composer.json coreapp/coreapp/composer.json
             ;;
         coreapp-reload)
-            docker-compose up coreapp --build -d
+            docker-compose up --build -d coreapp 
             ;;
         coreapp-test)
             docker run  -v $(pwd)/coreapp/test-reports:/var/www/html/ci4app/test-reports cynic_coreapp ./vendor/bin/phpunit
