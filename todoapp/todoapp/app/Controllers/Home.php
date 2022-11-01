@@ -2,11 +2,8 @@
 
 namespace App\Controllers;
 
-use CodeIgniter\Cookie\Cookie;
-use CodeIgniter\Cookie\CookieStore;
-use App\Libraries\CynicJWT;
-
-use DateTime;
+use App\Libraries\TodoItems;
+use App\Libraries\TodoItemsException;
 
 class Home extends BaseController
 {
@@ -24,11 +21,17 @@ class Home extends BaseController
         return $data;
     }
     
+    private function collectTodoItems($username, $jwt){
+        $ti = new TodoItems($username, $jwt);
+        $items = $ti->get_all_items();
+        return $items;
+    }
+    
     public function index()
     {
         // getting cookie in the current cookie collection
         $data = $this->getCookieData();
-        
+        $data["items"] = $this->collectTodoItems($data["username"], $data["jwt"]);
         return view('header', $data) . view('home', $data) . view('footer');
     }
     
@@ -113,52 +116,16 @@ class Home extends BaseController
         $data = $this->getCookieData();
         if($this->validate([
             'title' => 'required',
-        ])){
-            $config = new \Config\App();
-            $body = [
-                "jwt" => $data["jwt"] ,
-            ];
-            
-            $options = [
-                'baseURI' => $config->COREAPP_HOST,
-                'timeout' => 3,
-            ];
-            $client = \Config\Services::curlrequest($options);
-            try {
-                $response = $client->post('api/auth/authenticate', [
-                    'debug'=>true,
-                    'http_errors'=>false,
-                    'json'=>$body,
-                ]);
-            } catch (\CodeIgniter\HTTP\Exceptions\HTTPException $e) {
-                return redirect()->to('/login')->with('error', 'Critical: HTTPException raised.');
+        ])){      
+            $title = $this->request->getPost('title');
+            $details = $this->request->getPost('details');
+            $ti = new TodoItems($data["username"], $data["jwt"]);
+            try{
+                $ti->add($title, $details);
+                return redirect()->to('/')->with('message', 'Successful adding todo item!')->withCookies();
+            } catch (TodoItemsException $e){
+                return redirect()->to('/')->with('error', 'Critical: Failed to add item: '. $e->getMessage());   
             }
-            
-            $response_body = $response->getBody();
-            $response_code = $response->getStatusCode();        
-            if($response_code == 200){     
-                if (strpos($response->header('content-type'), 'application/json') !== false) {
-                    $response_body = json_decode($response_body, true);
-                    $jwt = $response_body["jwt"];
-                    $username = $response_body["username"];
-                    $role = $response_body["role"];
-                    helper('cookie');
-                    set_cookie('jwt', $jwt, $expire=3600);
-                    set_cookie('username', $username, $expire=3600);
-                    set_cookie('role', $role, $expire=3600);
-                    
-                    
-                    
-                }  else {
-                    //malformed response
-                    return redirect()->to('/')->with('error', 'Critical: Response from coreapp authenticate was not JSON.');
-                }
-            } elseif ($response_code == 401) {
-                    return redirect()->to('/')->with('error', 'User was not authenticated.  Logout, log in, and try again.');  
-            } else {
-                return redirect()->to('/')->with('error', 'Unknown error from coreapp authenticate, status code: ' + $response_code);
-            }
-        
         } else {
             return view('header', $data) . view('add') . view('footer');
         }
