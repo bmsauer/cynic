@@ -49,20 +49,26 @@ class Auth extends BaseController
         if($user === NULL){
              $data = [
                  'success' => false,
-                 'jwt' => ''
+                 'jwt' => '',
+                 'username' => '',
+                 'role' => '',
              ];
              $status_code = 401;
         } else {
             if(password_verify($submitted_password, $user['password'])){
                 $data = [
                     'success' => true,
-                    'jwt'=> CynicJWT::generate_jwt($user['username'], $user['role'])
+                    'jwt'=> CynicJWT::generate_jwt($user['username'], $user['role']),
+                    'username' => $user['username'],
+                    'role' => $user['role'],
                 ];
                 $status_code = 200;
             } else {
                  $data = [
                      'success' => false,
-                     'jwt' => ''
+                     'jwt' => '',
+                     'username' => '',
+                     'role' => '',
                  ];
                  $status_code = 401;
             }
@@ -82,7 +88,9 @@ class Auth extends BaseController
         } catch (\Exception $e){
             $data = [
                  'success' => false,
-                 'jwt' => ''
+                 'jwt' => '',
+                 'username' => '',
+                 'role' => '',
              ];
              $status_code = 401;
              return $this->response->setStatusCode($status_code)->setJSON($data);
@@ -101,13 +109,17 @@ class Auth extends BaseController
         {
              $data = [
                  'success' => false,
-                 'jwt' => ''
+                 'jwt' => '',
+                 'username' => '',
+                 'role' => '',
              ];
              $status_code = 401;
         } else {
             $data = [
                 'success' => true,
-                'jwt'=> CynicJWT::generate_jwt($token->username, $token->role)
+                'jwt'=> CynicJWT::generate_jwt($token->username, $token->role),
+                'username' => $token->username,
+                'role' => $token->role
              ];
             $status_code = 200;
         }

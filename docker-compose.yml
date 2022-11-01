@@ -18,6 +18,17 @@ services:
       - coredb
     command: ["wait-for-it", "coredb:3306", "--", "php", "spark", "migrate"]
     
+  todoapp:
+    build: todoapp/
+    ports:
+      - "8081:80"
+    env_file:
+      - todoapp/todoapp/.env
+    depends_on:
+      - coreapp
+    volumes:
+      - ./todoapp/todoapp/app:/var/www/html/ci4app/app
+    
   coredb:
     build: coredb/
     ports:
@@ -26,10 +37,16 @@ services:
       - coredb/.env
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - coredb_data:/var/lib/mysql
 
   db-cli:
     profiles: ["debug"]
     image: mysql:8.0.28-debian
     command: /bin/true
     tty: true
-    stdin_open: true 
+    stdin_open: true
+
+volumes:
+  coredb_data:
+    driver: local

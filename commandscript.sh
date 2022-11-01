@@ -39,6 +39,9 @@ do
         coreapp-shell)
             docker-compose exec coreapp /bin/bash
             ;;
+        coreapp-logs)
+            docker-compose logs -f coreapp
+            ;;
         coreapp-copycomposer)
             docker-compose cp coreapp:/var/www/html/ci4app/composer.lock coreapp/coreapp/composer.lock
             docker-compose cp coreapp:/var/www/html/ci4app/composer.json coreapp/coreapp/composer.json
@@ -51,6 +54,15 @@ do
             ;;
         coreapp-docs)
             cd coreapp && docker run --rm -v ${PWD}:/data phpdoc/phpdoc:3
+            ;;
+        todoapp-reload)
+            docker-compose up --build -d todoapp
+            ;;
+        todoapp-shell)
+            docker-compose exec todoapp /bin/bash
+            ;;
+        todoapp-logs)
+            docker-compose logs -f todoapp
             ;;
         *)
             echo "Invalid command: $COMMAND"
