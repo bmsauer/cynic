@@ -19,14 +19,11 @@ use CodeIgniter\Config\BaseService;
  */
 class Services extends BaseService
 {
-    /*
-     * public static function example($getShared = true)
-     * {
-     *     if ($getShared) {
-     *         return static::getSharedInstance('example');
-     *     }
-     *
-     *     return new \CodeIgniter\Example();
-     * }
-     */
+    public static function todoitems($username, $jwt, $getShared = true)
+     {
+         if ($getShared) {
+             return static::getSharedInstance('todoitems', $username, $jwt);
+         }
+         return new \App\Libraries\TodoItems($username, $jwt);
+     }
 }

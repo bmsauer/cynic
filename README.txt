@@ -67,52 +67,65 @@ complexity.
 
 -- RUNNING
 First, you need to build the base container that the applications are based 
-off of, ci4-base.  We will use the commandscript.sh which has commands already
-written out for us:
+off of, ci4-base.
 
-./commandscript.sh build-base
+cd ci4base
+docker build -t ci4base .
+cd ..
 
 Next, build each container in each service in the docker-compose.yml file:
 
-./commandscript.sh build
+docker-compose build 
 
 Then, run the application.  This will start it in the background.  You can see
 what is running with docker ps.
 
-./commandscript.sh up
+docker-compose up
+
+To run the application in the background, you can use:
+
+docker-compose up -d
+
+And to view logs:
+
+docker-compose logs
 
 You should be able to view the coreapp homepage at 'localhost:8080' in your 
 browser.
 
+To stop the application, use CTRL+C in the terminal.  If you started the
+containers with 'docker-compose up -d', then you can use:
+
+docker-compose down
+
 -- OTHER HELPFUL COMMANDS
 When running, you may want to do these commands:
 
-Add test data to the app:
-./commmandscript.sh seed-db
+Add user login data to the coreapp:
+docker-compose exec coreapp php spark db:seed Auth
 
-Drop into a MySQL CLI to do database debugging:
-./commandscript.sh db-cli
+Drop into a MySQL CLI to do database debugging.  Replace the $ variables with
+their values from coredb.env.
+docker-compose run db-cli mysql --host $DB_HOST --port 3306 --user $MYSQL_USER --password=$MYSQL_PASSWORD --database $MYSQL_DATABASE
 
 Drop into a app container sheel to debug:
-./commandscript.sh coreapp-shell
+docker-compose exec coreapp /bin/bash
 
-Reload the application:
-./commandscript.sh coreapp-reload
-
-Stop the app:
-./commandscript.sh destroy
+Reload the coreapp:
+docker-compose up --build -d coreapp 
 
 Stop the app and clear the database:
-./commandscript.sh destroy-volumes
+docker-compose down -v
 
 -- TESTS AND DOCS
 When not running, try these commands:
 
 Test coreapp:
-./commandscript.sh coreapp-test
+docker run  -v ${PWD}/coreapp/test-reports:/var/www/html/ci4app/test-reports cynic_coreapp ./vendor/bin/phpunit
 
 Generate docs:
-./commandscript.sh coreapp-docs
+cd coreapp
+docker run --rm -v ${PWD}:/data phpdoc/phpdoc:3
 
 =========================================
 == DESIGN NOTES

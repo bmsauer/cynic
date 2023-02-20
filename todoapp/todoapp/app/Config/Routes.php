@@ -42,7 +42,7 @@ $routes->get('/logout', 'Home::logoutForm');
 $routes->post('/logout', 'Home::logout');
 $routes->get('/add', 'Home::addForm');
 $routes->post('/add', 'Home::add');
-
+$routes->post('/complete', 'Home::complete');
 
 /*
  * --------------------------------------------------------------------

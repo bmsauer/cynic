@@ -52,6 +52,10 @@ class TodoItems {
         $this->update_all_ids($all_ids_array);  
     }
     
+    public function complete($id){
+        $this->update_item_field($id, "completed", "true");
+    }
+    
     public function get_all_items(){
         $all_ids_array = $this->get_all_ids();
         $all_items = array();
@@ -82,8 +86,11 @@ class TodoItems {
         if($response_code == 200){
           $response_body = json_decode($response_body, true);
           $all_ids = $response_body["datum"]["value"];
-          return explode(" ", $all_ids);
-          
+          if (strlen($all_ids)){
+            return explode(" ", $all_ids);
+          } else {
+            return array();
+          }
         } elseif($response_code == 400){
           //doesn't exist yet
           return array();

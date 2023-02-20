@@ -31,12 +31,11 @@ services:
     
   coredb:
     build: coredb/
+    platform: linux/x86_64
     ports:
-      - "${DB_PORT}:3306"
+      - "43306:3306"
     env_file:
       - coredb/.env
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     volumes:
       - coredb_data:/var/lib/mysql
 

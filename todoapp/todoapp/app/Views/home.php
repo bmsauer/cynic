@@ -7,6 +7,7 @@
     <?php if (empty($items) || !is_array($items)): ?>
     <p>No items!</p>
     <?php else: ?>
+    <p>Total Items: <?= esc($total_items) ?> </p>
     <?php foreach($items as $id => $item): ?>
         <details>
         <summary><?= esc($item['title']) ?></summary>
@@ -14,6 +15,12 @@
         <ul>
             <li>Completed: <?= esc($item['completed']) ?></li>
             <li>Date Added: <?= esc($item['date_added']) ?> </li>
+            <form method="post" action="/complete">
+                <?= csrf_field() ?>
+                <input type="hidden" name="id" value="<?= esc($id) ?>" />
+                <input type="submit" value="Complete" />
+            </form>
+                
         </ul>
         </details>
     <?php endforeach ?>

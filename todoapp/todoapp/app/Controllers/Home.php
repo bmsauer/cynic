@@ -22,7 +22,7 @@ class Home extends BaseController
     }
     
     private function collectTodoItems($username, $jwt){
-        $ti = new TodoItems($username, $jwt);
+        $ti = \Config\Services::todoitems($username, $jwt);
         $items = $ti->get_all_items();
         return $items;
     }
@@ -32,6 +32,13 @@ class Home extends BaseController
         // getting cookie in the current cookie collection
         $data = $this->getCookieData();
         $data["items"] = $this->collectTodoItems($data["username"], $data["jwt"]);
+        
+        $total = 0;
+        foreach($data["items"] as $id => $item){
+            $total++;
+        }
+        
+        $data["total_items"] = $total;
         return view('header', $data) . view('home', $data) . view('footer');
     }
     
@@ -119,7 +126,8 @@ class Home extends BaseController
         ])){      
             $title = $this->request->getPost('title');
             $details = $this->request->getPost('details');
-            $ti = new TodoItems($data["username"], $data["jwt"]);
+            //$ti = new TodoItems($data["username"], $data["jwt"]);
+            $ti = \Config\Services::todoitems($data["username"], $data["jwt"]);
             try{
                 $ti->add($title, $details);
                 return redirect()->to('/')->with('message', 'Successful adding todo item!')->withCookies();
@@ -130,5 +138,13 @@ class Home extends BaseController
             return view('header', $data) . view('add') . view('footer');
         }
         
+    }
+    
+    public function complete(){
+        $data = $this->getCookieData();
+        $id = $this->request->getPost('id');
+        $ti = \Config\Services::todoitems($data["username"], $data["jwt"]);
+        $ti->complete($id);
+        return redirect()->to('/')->with('message', 'Successful completing todo item!')->withCookies();
     }
 }

@@ -46,7 +46,7 @@ $routes->post('/api/auth/authenticate', 'Auth::authenticate');
 $routes->post('/api/db/(:segment)/(:segment)', 'KeyValueDatabase::create/$1/$2');
 $routes->get('/api/db/(:segment)/(:segment)', 'KeyValueDatabase::read/$1/$2');
 $routes->put('/api/db/(:segment)/(:segment)', 'KeyValueDatabase::upsert/$1/$2');
-$routes->delete('/api/db/(:segment)/(:segment)', 'KeyValueDatabase::delete/$1/$2');
+$routes->delete('/api/db/(:segment)/(:segment)', 'KeyValueDatabase::remove/$1/$2');
 /*
  * --------------------------------------------------------------------
  * Additional Routing

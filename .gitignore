@@ -2,3 +2,5 @@
 .env
 coreapp/test-reports/*
 coreapp/.phpdoc
+todoapp/test-reports/*
+todoapp/.phpdoc
