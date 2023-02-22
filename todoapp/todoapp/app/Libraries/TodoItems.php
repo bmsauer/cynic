@@ -10,10 +10,10 @@ class TodoItemsException extends \Exception{
 class TodoItems {
     /*
         username.all_ids
-        username.item.<id>.title
-        username.item.<id>.details
-        username.item.<id>.date_added
-        username.item.<id>.completed
+        username.items.<id>.title
+        username.items.<id>.details
+        username.items.<id>.date_added
+        username.items.<id>.completed
     */
         
     private $username;

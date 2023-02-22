@@ -4,22 +4,11 @@ namespace App\Controllers;
 
 use App\Libraries\TodoItems;
 use App\Libraries\TodoItemsException;
+use App\Libraries\CookieAuthData;
 
 class Home extends BaseController
 {
-    private function getCookieData() : array{
-        helper('cookie');
-        $jwt = get_cookie('jwt');
-        $username = get_cookie('username');
-        $role = get_cookie('role');
-        
-        $data = [
-            "jwt" => $jwt,
-            "username" => $username,
-            "role" => $role
-        ];
-        return $data;
-    }
+    
     
     private function collectTodoItems($username, $jwt){
         $ti = \Config\Services::todoitems($username, $jwt);
@@ -29,8 +18,8 @@ class Home extends BaseController
     
     public function index()
     {
-        // getting cookie in the current cookie collection
-        $data = $this->getCookieData();
+        $cad = \Config\Services::cookieauthdata();
+        $data = $cad->getCookieData();
         $data["items"] = $this->collectTodoItems($data["username"], $data["jwt"]);
         
         $total = 0;
@@ -43,7 +32,8 @@ class Home extends BaseController
     }
     
     public function loginForm() {
-        $data = $this->getCookieData();
+        $cad = \Config\Services::cookieauthdata();
+        $data = $cad->getCookieData();
         return view('header',$data) . view('login') . view('footer');
     }
     
@@ -81,10 +71,8 @@ class Home extends BaseController
                     $jwt = $response_body["jwt"];
                     $username = $response_body["username"];
                     $role = $response_body["role"];
-                    helper('cookie');
-                    set_cookie('jwt', $jwt, $expire=3600);
-                    set_cookie('username', $username, $expire=3600);
-                    set_cookie('role', $role, $expire=3600);
+                    $cad = \Config\Services::cookieauthdata();
+                    $cad->setCookieData($jwt, $username, $role, 3600);
                     return redirect()->to('/')->with('message', 'Successful login!')->withCookies();
                 }  else {
                     //malformed response
@@ -101,32 +89,32 @@ class Home extends BaseController
     }
     
     public function logoutForm(){
-        $data = $this->getCookieData();
+        $cad = \Config\Services::cookieauthdata();
+        $data = $cad->getCookieData();
         return view('header', $data) . view('logout') . view('footer');
     }
     
     
     public function logout(){
-        helper('cookie');
-        set_cookie('jwt', '', $expire=0);
-        set_cookie('username', '', $expire=0);
-        set_cookie('role', '', $expire=0);
+        $cad = \Config\Services::cookieauthdata();
+        $cad->setCookieData('', '', '', 0);
         return redirect()->to('/')->with('message', 'Successful logout!')->withCookies();
     }
     
     public function addForm(){
-        $data = $this->getCookieData();
+        $cad = \Config\Services::cookieauthdata();
+        $data = $cad->getCookieData();
         return view('header', $data) . view('add') . view('footer');
     }
     
     public function add(){
-        $data = $this->getCookieData();
+        $cad = \Config\Services::cookieauthdata();
+        $data = $cad->getCookieData();
         if($this->validate([
             'title' => 'required',
         ])){      
             $title = $this->request->getPost('title');
             $details = $this->request->getPost('details');
-            //$ti = new TodoItems($data["username"], $data["jwt"]);
             $ti = \Config\Services::todoitems($data["username"], $data["jwt"]);
             try{
                 $ti->add($title, $details);
@@ -141,7 +129,8 @@ class Home extends BaseController
     }
     
     public function complete(){
-        $data = $this->getCookieData();
+        $cad = \Config\Services::cookieauthdata();
+        $data = $cad->getCookieData();
         $id = $this->request->getPost('id');
         $ti = \Config\Services::todoitems($data["username"], $data["jwt"]);
         $ti->complete($id);

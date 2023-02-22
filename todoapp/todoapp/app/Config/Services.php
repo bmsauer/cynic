@@ -26,4 +26,11 @@ class Services extends BaseService
          }
          return new \App\Libraries\TodoItems($username, $jwt);
      }
+     
+     public static function cookieauthdata($getShared = true){
+         if( $getShared) {
+             return static::getSharedInstance('cookieauthdata');
+         }
+         return new \App\Libraries\CookieAuthData();
+     }
 }

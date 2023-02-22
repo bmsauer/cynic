@@ -16,6 +16,9 @@ class HomeTest extends CIUnitTestCase
     
     protected function tearDown(): void
     {
+        unset($_SESSION['error']);
+        unset($_SESSION['message']);
+        service('validation')->reset();
         parent::tearDown();
     }
     
@@ -44,6 +47,7 @@ class HomeTest extends CIUnitTestCase
         ]);
         $result->assertStatus(200);
         $result->assertSee('<form action="/add" method="post">');
+        //$result->assertSessionHas("error");
     }
     
     public function test_add_form(){
@@ -63,13 +67,20 @@ class HomeTest extends CIUnitTestCase
         $stub = $this->createStub(\App\Libraries\TodoItems::class);
         $stub->method('get_all_items')->willReturn($fakeitems);
         \Config\Services::injectMock("todoitems", $stub);
-        helper('cookie');
-        set_cookie('jwt', 'test', $expire=0);
-        set_cookie('username', 'test', $expire=0);
-        set_cookie('role', 'test', $expire=0);
+        
+        
+        $cookiedata = [
+            "jwt" => 'testjwt',
+            "username" => 'testusername',
+            "role" => 'testrole'
+        ];
+        $cookiestub = $this->createStub(\App\Libraries\CookieAuthData::class);
+        $cookiestub->method('getCookieData')->willreturn($cookiedata);
+        \Config\Services::injectMock("cookieauthdata", $cookiestub);
+        
         
         $result = $this->call("get", "/");
-        print_r($result->response()->getBody());
+        //print_r($result->response()->getBody());
         $result->assertStatus(200);
         $result->assertSee("<p>Total Items: 1 </p>");
     }

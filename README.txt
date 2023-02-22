@@ -75,7 +75,18 @@ cd ..
 
 Next, build each container in each service in the docker-compose.yml file:
 
-docker-compose build 
+docker-compose build
+
+Sometimes, there is a race condition with the database, where it doesn't
+properly initialize on first run.  This is due to the docker volumes being
+initialized slowly, the database reporting it is online, and the coreapp 
+attempting to migrate the database while it isn't truly ready.  A workaround
+to this is to start the database to initialize the volumes, wait, stop the
+database, and then turn on the entire application.
+
+docker-compose up coredb
+
+Use CTRL+C to stop the database, and allow it to gracefully shut down.
 
 Then, run the application.  This will start it in the background.  You can see
 what is running with docker ps.
